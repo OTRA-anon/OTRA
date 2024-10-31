@@ -1,0 +1,190 @@
+@prefix : <http://ontology.tno.nl/OTRA#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://ontology.tno.nl/OTRA#> .
+
+<http://ontology.tno.nl/OTRA#> rdf:type owl:Ontology ;
+                                rdfs:comment "The OTRA ontology (Ontology for Transparent Agreement) is a risk management framework tailored for Service Level Agreements (SLAs) in federated cloud environments. It extends the Gaia-X Core Ontology to include structured components for identifying, preventing, and mitigating risks within SLAs, enhancing transparency and accountability between cloud service providers and consumers. Based on the bow-tie risk assessment model, OTRA represents Hazardous Events linked to Preconditions (triggers), Prevention Mechanisms, Postconditions (outcomes), and Remedies. By embedding risk data within SLAs, OTRA supports proactive risk management, fosters compliance with regional regulations, and enables clear communication of risks and mitigation strategies in cloud federations." .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://ontology.tno.nl/OTRA#hasPostcondition
+:hasPostcondition rdf:type owl:ObjectProperty ,
+                           owl:AsymmetricProperty ;
+                  rdfs:domain :HazardoudEvent ;
+                  rdfs:range :Postcondition ;
+                  rdfs:comment "The relationship between the hazardous event and the postcondition"@en ;
+                  rdfs:label "has Postcondition"@en .
+
+
+###  http://ontology.tno.nl/OTRA#hasPrecondition
+:hasPrecondition rdf:type owl:ObjectProperty ,
+                          owl:AsymmetricProperty ;
+                 rdfs:domain :HazardoudEvent ;
+                 rdfs:range :Precondition ;
+                 rdfs:comment "the relationship between the hazardous event and the precondition"@en ;
+                 rdfs:label "has Precondition"@en .
+
+
+###  http://ontology.tno.nl/OTRA#hasPreventionMechanism
+:hasPreventionMechanism rdf:type owl:ObjectProperty ,
+                                 owl:AsymmetricProperty ;
+                        rdfs:domain [ rdf:type owl:Class ;
+                                      owl:unionOf ( :HazardoudEvent
+                                                    :Precondition
+                                                  )
+                                    ] ;
+                        rdfs:range :PreventionMechanism ;
+                        rdfs:comment "The relationship between either the hazardous event or precondition and the prevention mechanism"@en ;
+                        rdfs:label "has Prevention Mechanism"@en .
+
+
+###  http://ontology.tno.nl/OTRA#hasRemedy
+:hasRemedy rdf:type owl:ObjectProperty ,
+                    owl:AsymmetricProperty ;
+           rdfs:domain [ rdf:type owl:Class ;
+                         owl:unionOf ( :HazardoudEvent
+                                       :Postcondition
+                                     )
+                       ] ;
+           rdfs:range :Remedy ;
+           rdfs:comment "The relationship between either the hazardous event or the postcondition and the remedy"@en ;
+           rdfs:label "has Remedy"@en .
+
+
+###  http://ontology.tno.nl/OTRA#hasRisk
+:hasRisk rdf:type owl:ObjectProperty ,
+                  owl:AsymmetricProperty ;
+         rdfs:domain :Agreement ;
+         rdfs:range :HazardoudEvent ;
+         rdfs:comment "the relationship between the agreement and hazardous event"@en ;
+         rdfs:label "has risk"@en .
+
+
+###  http://ontology.tno.nl/OTRA#impactEntity
+:impactEntity rdf:type owl:ObjectProperty ,
+                       owl:AsymmetricProperty ;
+              rdfs:domain :HazardoudEvent ;
+              rdfs:range [ rdf:type owl:Class ;
+                           owl:unionOf ( <https://www.w3id.org/gaia-x/core#Consumer>
+                                         <https://www.w3id.org/gaia-x/participant#Provider>
+                                       )
+                         ] ;
+              rdfs:comment "The relationship between the hazardous event and the consumer or provider"@en ;
+              rdfs:label "impact entity"@en .
+
+
+###  http://ontology.tno.nl/OTRA#involvesParty
+:involvesParty rdf:type owl:ObjectProperty ;
+               rdfs:label "involves parties"@en .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://ontology.tno.nl/OTRA#hasText
+:hasText rdf:type owl:DatatypeProperty .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://ontology.tno.nl/OTRA#Agreement
+:Agreement rdf:type owl:Class ;
+           rdfs:subClassOf [ rdf:type owl:Restriction ;
+                             owl:onProperty :hasRisk ;
+                             owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :HazardoudEvent
+                           ] ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :involvesParty ;
+                             owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass <https://www.w3id.org/gaia-x/core#Consumer>
+                           ] ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :involvesParty ;
+                             owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass <https://www.w3id.org/gaia-x/participant#Provider>
+                           ] ;
+           rdfs:comment "An agreement is a binding contract between two parties that can incur penalties when violated"@en ;
+           rdfs:label "Agreement"@en .
+
+
+###  http://ontology.tno.nl/OTRA#HazardoudEvent
+:HazardoudEvent rdf:type owl:Class ;
+                rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                  owl:onProperty :hasPostcondition ;
+                                  owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                  owl:onClass :Postcondition
+                                ] ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty :hasPrecondition ;
+                                  owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                  owl:onClass :Precondition
+                                ] ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty :hasPreventionMechanism ;
+                                  owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                  owl:onClass :PreventionMechanism
+                                ] ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty :hasRemedy ;
+                                  owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                  owl:onClass :Remedy
+                                ] ;
+                rdfs:comment "An hazardous event  is a circumstance that exposes an entity to one or more hazards"@en ;
+                rdfs:label "Hazardous Event"@en .
+
+
+###  http://ontology.tno.nl/OTRA#Postcondition
+:Postcondition rdf:type owl:Class ;
+               rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                 owl:onProperty :hasPreventionMechanism ;
+                                 owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                 owl:onClass :PreventionMechanism
+                               ] ,
+                               [ rdf:type owl:Restriction ;
+                                 owl:onProperty :hasRemedy ;
+                                 owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                 owl:onClass :Remedy
+                               ] ;
+               rdfs:comment "A postcondition to an hazardous event"@en ;
+               rdfs:label "Postcondition"@en .
+
+
+###  http://ontology.tno.nl/OTRA#Precondition
+:Precondition rdf:type owl:Class ;
+              rdfs:comment "A precondition to an hazardous event"@en ;
+              rdfs:label "Precondition"@en .
+
+
+###  http://ontology.tno.nl/OTRA#PreventionMechanism
+:PreventionMechanism rdf:type owl:Class ;
+                     rdfs:comment "Mechanism to prevent the hazardous event"@en ;
+                     rdfs:label "Prevention Mechanism"@en .
+
+
+###  http://ontology.tno.nl/OTRA#Remedy
+:Remedy rdf:type owl:Class ;
+        rdfs:comment "The mechamism to remedy an hazardous event"@en ;
+        rdfs:label "Remedy"@en .
+
+
+###  https://www.w3id.org/gaia-x/core#Consumer
+<https://www.w3id.org/gaia-x/core#Consumer> rdf:type owl:Class ;
+                                            rdfs:label "Consumer"@en .
+
+
+###  https://www.w3id.org/gaia-x/participant#Provider
+<https://www.w3id.org/gaia-x/participant#Provider> rdf:type owl:Class ;
+                                                   rdfs:label "Provider"@en .
+
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi
